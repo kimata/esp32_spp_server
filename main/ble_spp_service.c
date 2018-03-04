@@ -1,4 +1,4 @@
-#include "ble_spp_server.h"
+#include "esp32_spp_server.h"
 
 #include "esp_gap_ble_api.h"
 #include "esp_gatt_defs.h"

@@ -1,4 +1,4 @@
-#include "ble_spp_server.h"
+#include "esp32_spp_server.h"
 
 #include <stdlib.h>
 #include <stdint.h>
