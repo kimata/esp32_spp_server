@@ -325,7 +325,7 @@ void gatts_profile_event_handler(esp_gatts_cb_event_t event,
         break;
     case ESP_GATTS_CREAT_ATTR_TAB_EVT:
         if (param->add_attr_tab.status != ESP_GATT_OK){
-            ESP_LOGE(TAG, "Failed to create attribute table.\n");
+            ESP_LOGE(TAG, "Failed to create attribute table.");
             break;
         }
         memcpy(spp_handle_table, param->add_attr_tab.handles, sizeof(spp_handle_table));

@@ -30,14 +30,14 @@ static str_buf_node_t *str_buf_make_node(uint8_t *str, uint32_t len)
     str_buf_node_t *node = (str_buf_node_t *)malloc(sizeof(str_buf_node_t));
 
     if (node == NULL) {
-        ESP_LOGE(TAG, "Failed to malloc at %s.\n", __func__);
+        ESP_LOGE(TAG, "Failed to malloc at %s.", __func__);
         return NULL;
     }
 
     node->len = len;
     node->str = (uint8_t *)malloc(len);
     if (node->str == NULL) {
-        ESP_LOGE(TAG, "Failed to malloc at %s.\n", __func__);
+        ESP_LOGE(TAG, "Failed to malloc at %s.", __func__);
         free(node);
         return NULL;
     }

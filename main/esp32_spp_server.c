@@ -52,7 +52,7 @@ void handle_uart_local_data(uint8_t *str, uint32_t len)
 
         buf = (uint8_t *)malloc((mtu_size-3)*sizeof(uint8_t));
         if (buf == NULL) {
-            ESP_LOGE(TAG, "Failed to malloc at %s.\n", __func__);
+            ESP_LOGE(TAG, "Failed to malloc at %s.", __func__);
             return;
         }
 
@@ -107,18 +107,18 @@ void uart_task(void *pvParameters)
         len = event.size;
         buf = (uint8_t *)malloc(sizeof(uint8_t)*len);
         if (buf == NULL) {
-            ESP_LOGE(TAG, "Failed to malloc at %s.\n", __func__);
+            ESP_LOGE(TAG, "Failed to malloc at %s.", __func__);
             break;
         }
         uart_read(buf, len);
 
         do {
             if (!gatts_profile()->is_connected) {
-                ESP_LOGI(TAG, "BLE is NOT connected.\n");
+                ESP_LOGI(TAG, "BLE is NOT connected.");
                 break;
             }
             if (!gatts_profile()->is_notify_enabled) {
-                ESP_LOGI(TAG, "Data Notify is NOT enabled.\n");
+                ESP_LOGI(TAG, "Data Notify is NOT enabled.");
                 break;
             }
             handle_uart_local_data(buf, len);
@@ -157,7 +157,7 @@ void handle_command(uint8_t *str, uint32_t len)
     spp_cmd_buff = (uint8_t *)malloc(sizeof(uint8_t)*(len));
 
     if(spp_cmd_buff == NULL){
-        ESP_LOGE(TAG, "Failed to malloc at %s.\n", __func__);
+        ESP_LOGE(TAG, "Failed to malloc at %s.", __func__);
         return;
     }
     memcpy(spp_cmd_buff, str, len);
@@ -231,12 +231,12 @@ void app_main()
     esp_ble_gap_register_callback(gap_event_handler);
     esp_ble_gatts_app_register(ESP_SPP_APP_ID);
 
-    ESP_LOGI(TAG, "BLE intialization is done.\n");
+    ESP_LOGI(TAG, "BLE intialization is done.");
 
     uart_init();
     spp_task_init();
 
-    ESP_LOGI(TAG, "Task is started.\n");
+    ESP_LOGI(TAG, "Task is started.");
 
     return;
 }
