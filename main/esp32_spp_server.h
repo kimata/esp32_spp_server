@@ -1,12 +1,3 @@
-/*
-   This example code is in the Public Domain (or CC0 licensed, at your option.)
-
-   Unless required by applicable law or agreed to in writing, this
-   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-   CONDITIONS OF ANY KIND, either express or implied.
-*/
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -14,19 +5,10 @@
 
 #include "esp_gatts_api.h"
 
-/*
- * DEFINES
- ****************************************************************************************
- */
-//#define SUPPORT_HEARTBEAT
-//#define SPP_DEBUG_MODE
-
-#define spp_sprintf(s,...)         sprintf((char*)(s), ##__VA_ARGS__)
 #define SPP_DATA_MAX_LEN           (512)
 #define SPP_CMD_MAX_LEN            (20)
 #define SPP_STATUS_MAX_LEN         (20)
-#define SPP_DATA_BUFF_MAX_LEN      (2*1024)
-///Attributes State Machine
+
 typedef enum {
     SPP_IDX_SVC,
 
@@ -44,19 +26,14 @@ typedef enum {
     SPP_IDX_SPP_STATUS_VAL,
     SPP_IDX_SPP_STATUS_CFG,
 
-#ifdef SUPPORT_HEARTBEAT
-    SPP_IDX_SPP_HEARTBEAT_CHAR,
-    SPP_IDX_SPP_HEARTBEAT_VAL,
-    SPP_IDX_SPP_HEARTBEAT_CFG,
-#endif
-
     SPP_IDX_NB,
 } spp_index_t;
+
 #define ESP_SPP_APP_ID              0x56
 #define SPP_PROFILE_NUM             1
 #define SPP_PROFILE_APP_IDX         0
 
-#define TAG  "GATTS_SPP_DEMO"
+#define TAG  "ESP32_BLE_SPP"
 
 typedef struct gatts_profile_inst {
     esp_gatts_cb_t gatts_cb;
