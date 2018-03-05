@@ -5,6 +5,8 @@
 
 #include "esp_gatts_api.h"
 
+#define UART_NUM UART_NUM_0
+
 #define SPP_DATA_MAX_LEN           (512)
 #define SPP_CMD_MAX_LEN            (20)
 #define SPP_STATUS_MAX_LEN         (20)

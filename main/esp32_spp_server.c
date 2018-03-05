@@ -22,12 +22,12 @@ static xQueueHandle cmd_queue = NULL;
 // UART function
 static void uart_write(uint8_t *str, uint32_t len)
 {
-    uart_write_bytes(UART_NUM_0, (char *)str, len);
+    uart_write_bytes(UART_NUM, (char *)str, len);
 }
 
 static void uart_read(uint8_t *buf, uint32_t len)
 {
-    uart_read_bytes(UART_NUM_0, buf, len, portMAX_DELAY);
+    uart_read_bytes(UART_NUM, buf, len, portMAX_DELAY);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -91,7 +91,7 @@ void uart_task(void *pvParameters)
     static QueueHandle_t uart_queue = NULL;
     uart_event_t event;
 
-    uart_driver_install(UART_NUM_0, 4096, 8192, 10,&uart_queue,0);
+    uart_driver_install(UART_NUM, 4096, 8192, 10,&uart_queue,0);
 
     while (1) {
         uint8_t *buf;
@@ -195,8 +195,8 @@ static void uart_init(void)
         .rx_flow_ctrl_thresh = 122,
     };
 
-    uart_param_config(UART_NUM_0, &uart_config);
-    uart_set_pin(UART_NUM_0,
+    uart_param_config(UART_NUM, &uart_config);
+    uart_set_pin(UART_NUM,
                  UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE,
                  UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
 }
@@ -205,7 +205,7 @@ static void uart_init(void)
 // Command
 static void spp_task_init(void)
 {
-    xTaskCreate(uart_task, "uart_task", 2048, (void*)UART_NUM_0, 8, NULL);
+    xTaskCreate(uart_task, "uart_task", 2048, (void*)UART_NUM, 8, NULL);
     xTaskCreate(command_task, "command_task", 2048, NULL, 10, NULL);
 }
 
