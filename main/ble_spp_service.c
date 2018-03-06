@@ -113,7 +113,7 @@ const esp_gatts_attr_db_t SPP_GATT_DB[SPP_IDX_NB] =
     },
 
     // Data notify: characteristic value
-    [SPP_IDX_SPP_DATA_NTY_VAL] = {
+    [SPP_IDX_SPP_DATA_NOTIFY_VAL] = {
         { ESP_GATT_AUTO_RSP },
         {
             ESP_UUID_LEN_16, (uint8_t *)&SPP_DATA_NOTIFY_UUID,
@@ -124,7 +124,7 @@ const esp_gatts_attr_db_t SPP_GATT_DB[SPP_IDX_NB] =
     },
 
     // Data notify: client characteristic configuration descriptor
-    [SPP_IDX_SPP_DATA_NTF_CFG] = {
+    [SPP_IDX_SPP_DATA_NOTIFY_CFG] = {
         { ESP_GATT_AUTO_RSP },
         {
             ESP_UUID_LEN_16, (uint8_t *)&CHAR_CLIENT_CONFIG_UUID,
@@ -209,7 +209,7 @@ gatts_profile_inst_t *gatts_profile()
 
 uint16_t gatts_handle(spp_index_t index)
 {
-    return spp_handle_table[SPP_IDX_SPP_DATA_NTY_VAL];
+    return spp_handle_table[SPP_IDX_SPP_DATA_NOTIFY_VAL];
 }
 
 void gatts_event_handler(esp_gatts_cb_event_t event,
@@ -260,7 +260,7 @@ void handle_gatts_write_event(uint8_t res, esp_ble_gatts_cb_param_t *param)
         case SPP_IDX_SPP_COMMAND_VAL:
             handle_command(param->write.value, param->write.len);
             break;
-        case SPP_IDX_SPP_DATA_NTF_CFG:
+        case SPP_IDX_SPP_DATA_NOTIFY_CFG:
             if (param->write.len != 2) {
                 break;
             }

@@ -41,7 +41,7 @@ void handle_uart_local_data(uint8_t *str, uint32_t len)
     if (len <= (mtu_size - 3)) {
         esp_ble_gatts_send_indicate(gatts_profile()->gatts_if,
                                     gatts_profile()->connection_id,
-                                    gatts_handle(SPP_IDX_SPP_DATA_NTY_VAL),
+                                    gatts_handle(SPP_IDX_SPP_DATA_NOTIFY_VAL),
                                     len,
                                     str,
                                     false);
@@ -74,7 +74,7 @@ void handle_uart_local_data(uint8_t *str, uint32_t len)
 
             esp_ble_gatts_send_indicate(gatts_profile()->gatts_if,
                                         gatts_profile()->connection_id,
-                                        gatts_handle(SPP_IDX_SPP_DATA_NTY_VAL),
+                                        gatts_handle(SPP_IDX_SPP_DATA_NOTIFY_VAL),
                                         data_size + 4,
                                         buf, false);
 
