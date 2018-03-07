@@ -194,7 +194,7 @@ static void gatts_profile_event_handler(esp_gatts_cb_event_t event,
                                         esp_gatt_if_t gatts_if,
                                         esp_ble_gatts_cb_param_t *param);
 
-gatts_spp_status_t spp_profile_tab[SPP_PROFILE_NUM] = {
+gatts_spp_status_t spp_status[SPP_PROFILE_NUM] = {
     [SPP_PROFILE_APP_IDX] = {
         .gatts_cb = gatts_profile_event_handler,
         .gatts_if = ESP_GATT_IF_NONE,
@@ -204,7 +204,7 @@ gatts_spp_status_t spp_profile_tab[SPP_PROFILE_NUM] = {
 
 gatts_spp_status_t *gatts_profile()
 {
-    return &(spp_profile_tab[SPP_PROFILE_APP_IDX]);
+    return &(spp_status[SPP_PROFILE_APP_IDX]);
 }
 
 uint16_t gatts_handle(spp_index_t index)
@@ -227,9 +227,9 @@ void gatts_event_handler(esp_gatts_cb_event_t event,
 
     for (int i = 0; i < SPP_PROFILE_NUM; i++) {
         if ((gatts_if == ESP_GATT_IF_NONE) ||
-            (gatts_if == spp_profile_tab[i].gatts_if)) {
-            if (spp_profile_tab[i].gatts_cb != NULL) {
-                spp_profile_tab[i].gatts_cb(event, gatts_if, param);
+            (gatts_if == spp_status[i].gatts_if)) {
+            if (spp_status[i].gatts_cb != NULL) {
+                spp_status[i].gatts_cb(event, gatts_if, param);
             }
         }
     }
