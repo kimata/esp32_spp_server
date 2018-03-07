@@ -47,35 +47,29 @@ void handle_uart_local_data(uint8_t *str, uint32_t len)
                                     false);
     } else {
         uint32_t current_num = 0;
-        uint32_t max_data_size = mtu_size - 7;
+        uint32_t max_data_size = mtu_size - 3;
         uint32_t total_num = (len - 1) / max_data_size + 1;
 
-        buf = (uint8_t *)malloc((mtu_size-3)*sizeof(uint8_t));
+        buf = (uint8_t *)malloc(max_data_size*sizeof(uint8_t));
         if (buf == NULL) {
             ESP_LOGE(TAG, "Failed to malloc at %s.", __func__);
             return;
         }
 
-        buf[0] = '#';
-        buf[1] = '#';
-        buf[2] = total_num;
-
         while (current_num < total_num) {
             uint32_t data_size;
-
-            buf[3] = current_num + 1;
 
             if (current_num == (total_num - 1)) {
                 data_size = len % max_data_size;
             } else {
                 data_size = max_data_size;
             }
-            memcpy(buf+4, str, data_size);
+            memcpy(buf, str, data_size);
 
             esp_ble_gatts_send_indicate(gatts_profile()->gatts_if,
                                         gatts_profile()->connection_id,
                                         gatts_handle(SPP_IDX_SPP_DATA_NOTIFY_VAL),
-                                        data_size + 4,
+                                        data_size,
                                         buf, false);
 
             vTaskDelay(20 / portTICK_PERIOD_MS);
@@ -191,8 +185,7 @@ static void uart_init(void)
         .data_bits = UART_DATA_8_BITS,
         .parity = UART_PARITY_DISABLE,
         .stop_bits = UART_STOP_BITS_1,
-        .flow_ctrl = UART_HW_FLOWCTRL_RTS,
-        .rx_flow_ctrl_thresh = 122,
+        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
     };
 
     uart_param_config(UART_NUM, &uart_config);

@@ -37,7 +37,7 @@ typedef enum {
 
 #define TAG  "ESP32_BLE_SPP"
 
-typedef struct gatts_profile_inst {
+typedef struct gatts_spp_status {
     esp_gatts_cb_t gatts_cb;
     uint16_t gatts_if;
     uint16_t app_id;
@@ -53,7 +53,7 @@ typedef struct gatts_profile_inst {
     esp_gatt_char_prop_t property;
     uint16_t descr_handle;
     esp_bt_uuid_t descr_uuid;
-} gatts_profile_inst_t;
+} gatts_spp_status_t;
 
 void handle_uart_remote_data(uint8_t *str, uint32_t len);
 void handle_uart_remote_data_prep(uint8_t *str, uint32_t len);

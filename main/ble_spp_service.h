@@ -1,7 +1,7 @@
 #include "esp_gap_ble_api.h"
 #include "esp_gatts_api.h"
 
-gatts_profile_inst_t *gatts_profile();
+gatts_spp_status_t *gatts_profile();
 
 uint16_t gatts_handle(spp_index_t index);
 

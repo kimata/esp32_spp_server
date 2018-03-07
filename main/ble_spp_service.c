@@ -194,7 +194,7 @@ static void gatts_profile_event_handler(esp_gatts_cb_event_t event,
                                         esp_gatt_if_t gatts_if,
                                         esp_ble_gatts_cb_param_t *param);
 
-gatts_profile_inst_t spp_profile_tab[SPP_PROFILE_NUM] = {
+gatts_spp_status_t spp_profile_tab[SPP_PROFILE_NUM] = {
     [SPP_PROFILE_APP_IDX] = {
         .gatts_cb = gatts_profile_event_handler,
         .gatts_if = ESP_GATT_IF_NONE,
@@ -202,7 +202,7 @@ gatts_profile_inst_t spp_profile_tab[SPP_PROFILE_NUM] = {
     },
 };
 
-gatts_profile_inst_t *gatts_profile()
+gatts_spp_status_t *gatts_profile()
 {
     return &(spp_profile_tab[SPP_PROFILE_APP_IDX]);
 }
@@ -247,35 +247,29 @@ static uint8_t find_gatts_index(uint16_t handle)
 
 void handle_gatts_write_event(uint8_t res, esp_ble_gatts_cb_param_t *param)
 {
-    if (param->write.is_prep == true) {
-        switch (res) {
-        case SPP_IDX_SPP_DATA_RECV_VAL:
+    switch (res) {
+    case SPP_IDX_SPP_COMMAND_VAL:
+        handle_command(param->write.value, param->write.len);
+        break;
+    case SPP_IDX_SPP_DATA_NOTIFY_CFG:
+        if (param->write.len != 2) {
+            break;
+        }
+        if ((param->write.value[0] == 0x01) && (param->write.value[1] == 0x00)){
+            gatts_profile()->is_notify_enabled = true;
+        } else if ((param->write.value[0] == 0x00) && (param->write.value[1] == 0x00)) {
+            gatts_profile()->is_notify_enabled = false;
+        }
+        break;
+    case SPP_IDX_SPP_DATA_RECV_VAL:
+        if (param->write.is_prep == true) {
             handle_uart_remote_data_prep(param->write.value, param->write.len);
-            break;
-        default:
-            break;
-        }
-    } else {
-        switch (res) {
-        case SPP_IDX_SPP_COMMAND_VAL:
-            handle_command(param->write.value, param->write.len);
-            break;
-        case SPP_IDX_SPP_DATA_NOTIFY_CFG:
-            if (param->write.len != 2) {
-                break;
-            }
-            if ((param->write.value[0] == 0x01) && (param->write.value[1] == 0x00)){
-                gatts_profile()->is_notify_enabled = true;
-            } else if ((param->write.value[0] == 0x00) && (param->write.value[1] == 0x00)) {
-                gatts_profile()->is_notify_enabled = false;
-            }
-            break;
-        case SPP_IDX_SPP_DATA_RECV_VAL:
+        } else {
             handle_uart_remote_data(param->write.value, param->write.len);
-            break;
-        default:
-            break;
         }
+        break;
+    default:
+        break;
     }
 }
 
