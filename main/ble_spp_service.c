@@ -190,19 +190,19 @@ const esp_gatts_attr_db_t SPP_GATT_DB[SPP_IDX_NB] =
     },
 };
 
-static void gatts_profile_event_handler(esp_gatts_cb_event_t event,
+static void gatts_spp_status_event_handler(esp_gatts_cb_event_t event,
                                         esp_gatt_if_t gatts_if,
                                         esp_ble_gatts_cb_param_t *param);
 
 gatts_spp_status_t spp_status[SPP_PROFILE_NUM] = {
     [SPP_PROFILE_APP_IDX] = {
-        .gatts_cb = gatts_profile_event_handler,
+        .gatts_cb = gatts_spp_status_event_handler,
         .gatts_if = ESP_GATT_IF_NONE,
         .mtu_size = 23,
     },
 };
 
-gatts_spp_status_t *gatts_profile()
+gatts_spp_status_t *gatts_spp_status()
 {
     return &(spp_status[SPP_PROFILE_APP_IDX]);
 }
@@ -218,9 +218,9 @@ void gatts_event_handler(esp_gatts_cb_event_t event,
 {
     if (event == ESP_GATTS_REG_EVT) {
         if (param->reg.status == ESP_GATT_OK) {
-            gatts_profile()->gatts_if = gatts_if;
+            gatts_spp_status()->gatts_if = gatts_if;
         } else {
-            ESP_LOGE(TAG, "Failed to regist application.");
+            ESP_LOGE(SPP_TAG, "Failed to regist application.");
             return;
         }
     }
@@ -256,9 +256,9 @@ void handle_gatts_write_event(uint8_t res, esp_ble_gatts_cb_param_t *param)
             break;
         }
         if ((param->write.value[0] == 0x01) && (param->write.value[1] == 0x00)){
-            gatts_profile()->is_notify_enabled = true;
+            gatts_spp_status()->is_notify_enabled = true;
         } else if ((param->write.value[0] == 0x00) && (param->write.value[1] == 0x00)) {
-            gatts_profile()->is_notify_enabled = false;
+            gatts_spp_status()->is_notify_enabled = false;
         }
         break;
     case SPP_IDX_SPP_DATA_RECV_VAL:
@@ -280,9 +280,9 @@ void handle_gatts_exec_write_event(esp_ble_gatts_cb_param_t *param)
     }
 }
 
-void gatts_profile_event_handler(esp_gatts_cb_event_t event,
-                                 esp_gatt_if_t gatts_if,
-                                        esp_ble_gatts_cb_param_t *param)
+void gatts_spp_status_event_handler(esp_gatts_cb_event_t event,
+                                    esp_gatt_if_t gatts_if,
+                                    esp_ble_gatts_cb_param_t *param)
 {
     esp_ble_gatts_cb_param_t *p_data = (esp_ble_gatts_cb_param_t *) param;
     uint8_t res = find_gatts_index(p_data->read.handle);
@@ -305,21 +305,21 @@ void gatts_profile_event_handler(esp_gatts_cb_event_t event,
         handle_gatts_exec_write_event(p_data);
         break;
     case ESP_GATTS_MTU_EVT:
-        gatts_profile()->mtu_size = p_data->mtu.mtu;
+        gatts_spp_status()->mtu_size = p_data->mtu.mtu;
         break;
     case ESP_GATTS_CONNECT_EVT:
-        gatts_profile()->connection_id = p_data->connect.conn_id;
-        gatts_profile()->gatts_if = gatts_if;
-        gatts_profile()->is_connected = true;
+        gatts_spp_status()->connection_id = p_data->connect.conn_id;
+        gatts_spp_status()->gatts_if = gatts_if;
+        gatts_spp_status()->is_connected = true;
         break;
     case ESP_GATTS_DISCONNECT_EVT:
-        gatts_profile()->is_connected = false;
-        gatts_profile()->is_notify_enabled = false;
+        gatts_spp_status()->is_connected = false;
+        gatts_spp_status()->is_notify_enabled = false;
         esp_ble_gap_start_advertising(&spp_adv_params);
         break;
     case ESP_GATTS_CREAT_ATTR_TAB_EVT:
         if (param->add_attr_tab.status != ESP_GATT_OK){
-            ESP_LOGE(TAG, "Failed to create attribute table.");
+            ESP_LOGE(SPP_TAG, "Failed to create attribute table.");
             break;
         }
         memcpy(spp_handle_table, param->add_attr_tab.handles, sizeof(spp_handle_table));
@@ -338,7 +338,7 @@ void gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *par
         break;
     case ESP_GAP_BLE_ADV_START_COMPLETE_EVT:
         if (param->adv_start_cmpl.status != ESP_BT_STATUS_SUCCESS) {
-            ESP_LOGE(TAG, "Failed to start advertising.");
+            ESP_LOGE(SPP_TAG, "Failed to start advertising.");
         }
         break;
     default:

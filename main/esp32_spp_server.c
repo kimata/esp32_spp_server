@@ -36,11 +36,11 @@ static void uart_read(uint8_t *buf, uint32_t len)
 void handle_uart_local_data(uint8_t *str, uint32_t len)
 {
     uint8_t *buf;
-    uint32_t mtu_size = gatts_profile()->mtu_size;
+    uint32_t mtu_size = gatts_spp_status()->mtu_size;
 
     if (len <= (mtu_size - 3)) {
-        esp_ble_gatts_send_indicate(gatts_profile()->gatts_if,
-                                    gatts_profile()->connection_id,
+        esp_ble_gatts_send_indicate(gatts_spp_status()->gatts_if,
+                                    gatts_spp_status()->connection_id,
                                     gatts_handle(SPP_IDX_SPP_DATA_NOTIFY_VAL),
                                     len,
                                     str,
@@ -52,7 +52,7 @@ void handle_uart_local_data(uint8_t *str, uint32_t len)
 
         buf = (uint8_t *)malloc(max_data_size*sizeof(uint8_t));
         if (buf == NULL) {
-            ESP_LOGE(TAG, "Failed to malloc at %s.", __func__);
+            ESP_LOGE(SPP_TAG, "Failed to malloc at %s.", __func__);
             return;
         }
 
@@ -66,8 +66,8 @@ void handle_uart_local_data(uint8_t *str, uint32_t len)
             }
             memcpy(buf, str, data_size);
 
-            esp_ble_gatts_send_indicate(gatts_profile()->gatts_if,
-                                        gatts_profile()->connection_id,
+            esp_ble_gatts_send_indicate(gatts_spp_status()->gatts_if,
+                                        gatts_spp_status()->connection_id,
                                         gatts_handle(SPP_IDX_SPP_DATA_NOTIFY_VAL),
                                         data_size,
                                         buf, false);
@@ -101,18 +101,18 @@ void uart_task(void *pvParameters)
         len = event.size;
         buf = (uint8_t *)malloc(sizeof(uint8_t)*len);
         if (buf == NULL) {
-            ESP_LOGE(TAG, "Failed to malloc at %s.", __func__);
+            ESP_LOGE(SPP_TAG, "Failed to malloc at %s.", __func__);
             break;
         }
         uart_read(buf, len);
 
         do {
-            if (!gatts_profile()->is_connected) {
-                ESP_LOGI(TAG, "BLE is NOT connected.");
+            if (!gatts_spp_status()->is_connected) {
+                ESP_LOGI(SPP_TAG, "BLE is NOT connected.");
                 break;
             }
-            if (!gatts_profile()->is_notify_enabled) {
-                ESP_LOGI(TAG, "Data Notify is NOT enabled.");
+            if (!gatts_spp_status()->is_notify_enabled) {
+                ESP_LOGI(SPP_TAG, "Data Notify is NOT enabled.");
                 break;
             }
             handle_uart_local_data(buf, len);
@@ -151,7 +151,7 @@ void handle_command(uint8_t *str, uint32_t len)
     spp_cmd_buff = (uint8_t *)malloc(sizeof(uint8_t)*(len));
 
     if(spp_cmd_buff == NULL){
-        ESP_LOGE(TAG, "Failed to malloc at %s.", __func__);
+        ESP_LOGE(SPP_TAG, "Failed to malloc at %s.", __func__);
         return;
     }
     memcpy(spp_cmd_buff, str, len);
@@ -170,7 +170,7 @@ void command_task(void * arg)
         if (xQueueReceive(cmd_queue, &cmd_id, portMAX_DELAY) == pdFALSE) {
             continue;
         }
-        esp_log_buffer_char(TAG,(char *)(cmd_id),strlen((char *)cmd_id));
+        esp_log_buffer_char(SPP_TAG,(char *)(cmd_id),strlen((char *)cmd_id));
         free(cmd_id);
     }
     vTaskDelete(NULL);
@@ -224,12 +224,12 @@ void app_main()
     esp_ble_gap_register_callback(gap_event_handler);
     esp_ble_gatts_app_register(ESP_SPP_APP_ID);
 
-    ESP_LOGI(TAG, "BLE intialization is done.");
+    ESP_LOGI(SPP_TAG, "BLE intialization is done.");
 
     uart_init();
     spp_task_init();
 
-    ESP_LOGI(TAG, "Task is started.");
+    ESP_LOGI(SPP_TAG, "Task is started.");
 
     return;
 }

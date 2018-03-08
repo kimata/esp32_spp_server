@@ -35,7 +35,7 @@ typedef enum {
 #define SPP_PROFILE_NUM             1
 #define SPP_PROFILE_APP_IDX         0
 
-#define TAG  "ESP32_BLE_SPP"
+#define SPP_TAG  "ESP32_BLE_SPP"
 
 typedef struct gatts_spp_status {
     esp_gatts_cb_t gatts_cb;
