@@ -220,7 +220,7 @@ void gatts_event_handler(esp_gatts_cb_event_t event,
         if (param->reg.status == ESP_GATT_OK) {
             gatts_spp_status()->gatts_if = gatts_if;
         } else {
-            ESP_LOGE(SPP_TAG, "Failed to regist application.");
+            ESP_LOGE(TAG_SPP, "Failed to regist application.");
             return;
         }
     }
@@ -284,8 +284,7 @@ void gatts_spp_status_event_handler(esp_gatts_cb_event_t event,
                                     esp_gatt_if_t gatts_if,
                                     esp_ble_gatts_cb_param_t *param)
 {
-    esp_ble_gatts_cb_param_t *p_data = (esp_ble_gatts_cb_param_t *) param;
-    uint8_t res = find_gatts_index(p_data->read.handle);
+    uint8_t res = find_gatts_index(param->read.handle);
 
     switch (event) {
     case ESP_GATTS_REG_EVT:
@@ -299,16 +298,16 @@ void gatts_spp_status_event_handler(esp_gatts_cb_event_t event,
         }
         break;
     case ESP_GATTS_WRITE_EVT:
-        handle_gatts_write_event(res, p_data);
+        handle_gatts_write_event(res, param);
         break;
     case ESP_GATTS_EXEC_WRITE_EVT:
-        handle_gatts_exec_write_event(p_data);
+        handle_gatts_exec_write_event(param);
         break;
     case ESP_GATTS_MTU_EVT:
-        gatts_spp_status()->mtu_size = p_data->mtu.mtu;
+        gatts_spp_status()->mtu_size = param->mtu.mtu;
         break;
     case ESP_GATTS_CONNECT_EVT:
-        gatts_spp_status()->connection_id = p_data->connect.conn_id;
+        gatts_spp_status()->connection_id = param->connect.conn_id;
         gatts_spp_status()->gatts_if = gatts_if;
         gatts_spp_status()->is_connected = true;
         break;
@@ -319,7 +318,7 @@ void gatts_spp_status_event_handler(esp_gatts_cb_event_t event,
         break;
     case ESP_GATTS_CREAT_ATTR_TAB_EVT:
         if (param->add_attr_tab.status != ESP_GATT_OK){
-            ESP_LOGE(SPP_TAG, "Failed to create attribute table.");
+            ESP_LOGE(TAG_SPP, "Failed to create attribute table.");
             break;
         }
         memcpy(spp_handle_table, param->add_attr_tab.handles, sizeof(spp_handle_table));
@@ -338,7 +337,7 @@ void gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *par
         break;
     case ESP_GAP_BLE_ADV_START_COMPLETE_EVT:
         if (param->adv_start_cmpl.status != ESP_BT_STATUS_SUCCESS) {
-            ESP_LOGE(SPP_TAG, "Failed to start advertising.");
+            ESP_LOGE(TAG_SPP, "Failed to start advertising.");
         }
         break;
     default:

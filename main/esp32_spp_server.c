@@ -3,8 +3,8 @@
 #include "str_buf.h"
 
 #include "freertos/FreeRTOS.h"
+#include "freertos/queue.h"
 #include "freertos/task.h"
-#include "freertos/event_groups.h"
 
 #include "driver/uart.h"
 
@@ -52,7 +52,7 @@ void handle_uart_local_data(uint8_t *str, uint32_t len)
 
         buf = (uint8_t *)malloc(max_data_size*sizeof(uint8_t));
         if (buf == NULL) {
-            ESP_LOGE(SPP_TAG, "Failed to malloc at %s.", __func__);
+            ESP_LOGE(TAG_SPP, "Failed to malloc at %s.", __func__);
             return;
         }
 
@@ -101,18 +101,18 @@ void uart_task(void *pvParameters)
         len = event.size;
         buf = (uint8_t *)malloc(sizeof(uint8_t)*len);
         if (buf == NULL) {
-            ESP_LOGE(SPP_TAG, "Failed to malloc at %s.", __func__);
+            ESP_LOGE(TAG_SPP, "Failed to malloc at %s.", __func__);
             break;
         }
         uart_read(buf, len);
 
         do {
             if (!gatts_spp_status()->is_connected) {
-                ESP_LOGI(SPP_TAG, "BLE is NOT connected.");
+                ESP_LOGI(TAG_SPP, "BLE is NOT connected.");
                 break;
             }
             if (!gatts_spp_status()->is_notify_enabled) {
-                ESP_LOGI(SPP_TAG, "Data Notify is NOT enabled.");
+                ESP_LOGI(TAG_SPP, "Data Notify is NOT enabled.");
                 break;
             }
             handle_uart_local_data(buf, len);
@@ -151,7 +151,7 @@ void handle_command(uint8_t *str, uint32_t len)
     spp_cmd_buff = (uint8_t *)malloc(sizeof(uint8_t)*(len));
 
     if(spp_cmd_buff == NULL){
-        ESP_LOGE(SPP_TAG, "Failed to malloc at %s.", __func__);
+        ESP_LOGE(TAG_SPP, "Failed to malloc at %s.", __func__);
         return;
     }
     memcpy(spp_cmd_buff, str, len);
@@ -170,7 +170,7 @@ void command_task(void * arg)
         if (xQueueReceive(cmd_queue, &cmd_id, portMAX_DELAY) == pdFALSE) {
             continue;
         }
-        esp_log_buffer_char(SPP_TAG,(char *)(cmd_id),strlen((char *)cmd_id));
+        esp_log_buffer_char(TAG_SPP,(char *)(cmd_id),strlen((char *)cmd_id));
         free(cmd_id);
     }
     vTaskDelete(NULL);
@@ -224,12 +224,12 @@ void app_main()
     esp_ble_gap_register_callback(gap_event_handler);
     esp_ble_gatts_app_register(ESP_SPP_APP_ID);
 
-    ESP_LOGI(SPP_TAG, "BLE intialization is done.");
+    ESP_LOGI(TAG_SPP, "BLE intialization is done.");
 
     uart_init();
     spp_task_init();
 
-    ESP_LOGI(SPP_TAG, "Task is started.");
+    ESP_LOGI(TAG_SPP, "Task is started.");
 
     return;
 }
