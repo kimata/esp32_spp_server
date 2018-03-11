@@ -80,7 +80,7 @@ void handle_uart_local_data(uint8_t *str, uint32_t len)
     }
 }
 
-void uart_task(void *pvParameters)
+void uart_task(void * arg)
 {
     static QueueHandle_t uart_queue = NULL;
     uart_event_t event;
@@ -104,6 +104,7 @@ void uart_task(void *pvParameters)
             ESP_LOGE(TAG_SPP, "Failed to malloc at %s.", __func__);
             break;
         }
+        memset(buf, 0x00, len);
         uart_read(buf, len);
 
         do {
@@ -198,7 +199,7 @@ static void uart_init(void)
 // Command
 static void spp_task_init(void)
 {
-    xTaskCreate(uart_task, "uart_task", 2048, (void*)UART_NUM, 8, NULL);
+    xTaskCreate(uart_task, "uart_task", 2048, NULL, 8, NULL);
     xTaskCreate(command_task, "command_task", 2048, NULL, 10, NULL);
 }
 
@@ -220,9 +221,9 @@ void app_main()
     ESP_ERROR_CHECK(esp_bluedroid_init());
     ESP_ERROR_CHECK(esp_bluedroid_enable());
 
-    esp_ble_gatts_register_callback(gatts_event_handler);
-    esp_ble_gap_register_callback(gap_event_handler);
-    esp_ble_gatts_app_register(ESP_SPP_APP_ID);
+    ESP_ERROR_CHECK(esp_ble_gatts_register_callback(gatts_event_handler));
+    ESP_ERROR_CHECK(esp_ble_gap_register_callback(gap_event_handler));
+    ESP_ERROR_CHECK(esp_ble_gatts_app_register(ESP_SPP_APP_ID));
 
     ESP_LOGI(TAG_SPP, "BLE intialization is done.");
 
